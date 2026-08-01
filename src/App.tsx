@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef } from 'react';
-import { ThemeProvider } from './context/ThemeContext';
+import { ThemeProvider } from './context/ThemeContext'; // Vérifiez bien l'import en haut du fichier !
 import {
   ReactFlow,
   MiniMap,
@@ -25,7 +25,7 @@ import { useTheme } from './context/ThemeContext';
 import { initialNodes, initialEdges } from './initialData';
 import type { FunctionNodeData, DataType } from './types/diagram';
 
-// Import des images PNG
+// Import des icônes PNG
 import iconTrash from './assets/delete.png';
 import iconEdit from './assets/edit.png';
 import iconSave from './assets/save.png';
@@ -56,7 +56,7 @@ function FlowContent() {
   const [editingNode, setEditingNode] = useState<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Validation des connexions
+  // Validation des connexions de données
   const onConnect = useCallback(
     (params: Connection) => {
       const sourceNode = nodes.find((n) => n.id === params.source);
@@ -93,7 +93,7 @@ function FlowContent() {
     [nodes, setEdges, theme.edgeColor]
   );
 
-  // Édition d'un nœud (Double clic)
+  // Ouverture du modal d'édition au double-clic
   const onNodeDoubleClick = (_: React.MouseEvent, node: any) => {
     setEditingNode(JSON.parse(JSON.stringify(node)));
   };
@@ -104,7 +104,7 @@ function FlowContent() {
     setEditingNode(null);
   };
 
-  // Exportation PNG / SVG
+  // Export PNG / SVG
   const handleExport = (format: 'png' | 'svg') => {
     const viewportEl = document.querySelector('.react-flow__viewport') as HTMLElement;
     if (!viewportEl) return;
@@ -212,6 +212,46 @@ function FlowContent() {
     setNodes((nds) => [...nds, newNode]);
   };
 
+  // Gestion des entrées / sorties pour l'édition de fonction
+  const handleAddPort = (type: 'inputs' | 'outputs') => {
+    if (!editingNode) return;
+    const newPort = {
+      id: `${type === 'inputs' ? 'in' : 'out'}_${Date.now()}`,
+      name: type === 'inputs' ? 'arg' : 'res',
+      dataType: 'int' as DataType,
+    };
+    const updatedPorts = [...(editingNode.data[type] || []), newPort];
+    setEditingNode({
+      ...editingNode,
+      data: { ...editingNode.data, [type]: updatedPorts },
+    });
+  };
+
+  const handleRemovePort = (type: 'inputs' | 'outputs', index: number) => {
+    if (!editingNode) return;
+    const updatedPorts = [...editingNode.data[type]];
+    updatedPorts.splice(index, 1);
+    setEditingNode({
+      ...editingNode,
+      data: { ...editingNode.data, [type]: updatedPorts },
+    });
+  };
+
+  const handlePortChange = (
+    type: 'inputs' | 'outputs',
+    index: number,
+    field: 'name' | 'dataType',
+    value: string
+  ) => {
+    if (!editingNode) return;
+    const updatedPorts = [...editingNode.data[type]];
+    updatedPorts[index] = { ...updatedPorts[index], [field]: value };
+    setEditingNode({
+      ...editingNode,
+      data: { ...editingNode.data, [type]: updatedPorts },
+    });
+  };
+
   return (
     <div
       style={{
@@ -235,7 +275,7 @@ function FlowContent() {
         <MiniMap />
         <Background color="#aaa" gap={16} />
 
-        {/* Barre d'outils (Panel) */}
+        {/* Panel Toolbar */}
         <Panel position="top-left" style={panelStyle}>
           <input
             type="file"
@@ -275,25 +315,27 @@ function FlowContent() {
 
           <div style={separatorStyle} />
 
-          {/* Boutons d'exportation rétablis */}
-          <button onClick={() => handleExport('png')} title="Exporter en image PNG" style={textButtonStyle}>
+          <button onClick={() => handleExport('png')} title="Exporter PNG" style={textButtonStyle}>
             PNG
           </button>
-          <button onClick={() => handleExport('svg')} title="Exporter en vecteur SVG" style={textButtonStyle}>
+          <button onClick={() => handleExport('svg')} title="Exporter SVG" style={textButtonStyle}>
             SVG
           </button>
         </Panel>
       </ReactFlow>
 
-      {/* Modale Thèmes */}
+      {/* Modale de Thèmes */}
       <ThemeModal isOpen={isThemeModalOpen} onClose={() => setIsThemeModalOpen(false)} />
 
-      {/* Modale d'Édition Nœud */}
+      {/* Modale d'Édition Adaptative (Nœud Simple vs Fonction) */}
       {editingNode && (
         <div style={overlayStyle}>
-          <div style={editModalStyle}>
-            <h3>Éditer le Nœud</h3>
+          <div style={{ ...editModalStyle, width: editingNode.type === 'functionNode' ? '460px' : '360px' }}>
+            <h3 style={{ marginTop: 0, fontFamily: 'sans-serif' }}>
+              {editingNode.type === 'functionNode' ? 'Éditer la Fonction' : 'Éditer le Nœud Simple'}
+            </h3>
 
+            {/* Label / Nom */}
             <div style={formGroupStyle}>
               <label style={labelStyle}>Nom / Label :</label>
               <input
@@ -309,11 +351,11 @@ function FlowContent() {
               />
             </div>
 
+            {/* Commentaire Multiligne */}
             <div style={formGroupStyle}>
-              <label style={labelStyle}>Commentaire (afficher sous l'élément) :</label>
+              <label style={labelStyle}>Commentaire (sous l'élément) :</label>
               <textarea
                 rows={3}
-                placeholder="Description courte ou note sur plusieurs lignes..."
                 value={editingNode.data.comment || ''}
                 onChange={(e) =>
                   setEditingNode({
@@ -321,14 +363,11 @@ function FlowContent() {
                     data: { ...editingNode.data, comment: e.target.value },
                   })
                 }
-                style={{
-                  ...inputStyle,
-                  resize: 'vertical', // Permet d'étirer la zone de saisie si besoin
-                  fontFamily: 'sans-serif',
-                }}
+                style={{ ...inputStyle, resize: 'vertical', fontFamily: 'sans-serif' }}
               />
             </div>
 
+            {/* Si c'est un Nœud Simple */}
             {editingNode.type === 'simpleNode' && (
               <div style={formGroupStyle}>
                 <label style={labelStyle}>Type de donnée :</label>
@@ -346,7 +385,75 @@ function FlowContent() {
               </div>
             )}
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '16px' }}>
+            {/* Si c'est une Fonction */}
+            {editingNode.type === 'functionNode' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '10px' }}>
+                {/* Entrées */}
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                    <label style={labelStyle}>Entrées (Inputs) :</label>
+                    <button onClick={() => handleAddPort('inputs')} style={addPortButtonStyle}>
+                      + Ajouter Entrée
+                    </button>
+                  </div>
+                  {(editingNode.data.inputs || []).map((input: any, index: number) => (
+                    <div key={input.id || index} style={portRowStyle}>
+                      <input
+                        type="text"
+                        placeholder="Nom"
+                        value={input.name}
+                        onChange={(e) => handlePortChange('inputs', index, 'name', e.target.value)}
+                        style={{ ...inputStyle, flex: 1 }}
+                      />
+                      <input
+                        type="text"
+                        placeholder="Type"
+                        value={input.dataType}
+                        onChange={(e) => handlePortChange('inputs', index, 'dataType', e.target.value)}
+                        style={{ ...inputStyle, flex: 1 }}
+                      />
+                      <button onClick={() => handleRemovePort('inputs', index)} style={deletePortButtonStyle}>
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Sorties */}
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                    <label style={labelStyle}>Sorties (Outputs) :</label>
+                    <button onClick={() => handleAddPort('outputs')} style={addPortButtonStyle}>
+                      + Ajouter Sortie
+                    </button>
+                  </div>
+                  {(editingNode.data.outputs || []).map((output: any, index: number) => (
+                    <div key={output.id || index} style={portRowStyle}>
+                      <input
+                        type="text"
+                        placeholder="Nom"
+                        value={output.name}
+                        onChange={(e) => handlePortChange('outputs', index, 'name', e.target.value)}
+                        style={{ ...inputStyle, flex: 1 }}
+                      />
+                      <input
+                        type="text"
+                        placeholder="Type"
+                        value={output.dataType}
+                        onChange={(e) => handlePortChange('outputs', index, 'dataType', e.target.value)}
+                        style={{ ...inputStyle, flex: 1 }}
+                      />
+                      <button onClick={() => handleRemovePort('outputs', index)} style={deletePortButtonStyle}>
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Boutons d'action du modal */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '20px' }}>
               <button onClick={() => setEditingNode(null)} style={cancelButtonStyle}>
                 Annuler
               </button>
@@ -372,7 +479,6 @@ export default function App() {
 }
 
 // Styles
-// Styles de la barre d'outils agrandie
 const panelStyle: React.CSSProperties = {
   display: 'flex',
   gap: '8px',
@@ -386,21 +492,20 @@ const panelStyle: React.CSSProperties = {
 
 const iconButtonStyle: React.CSSProperties = {
   background: '#f8f9fa',
-  border: '1px solid #ffffff',
+  border: '1px solid #cccccc',
   borderRadius: '8px',
-  width: '29px',          // 👈 Agrandie de 32px à 42px
-  height: '29px',         // 👈 Agrandie de 32px à 42px
+  width: '42px',
+  height: '42px',
   cursor: 'pointer',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  padding: '0',
-  transition: 'background-color 0.2s',
+  padding: 0,
 };
 
 const iconImgStyle: React.CSSProperties = {
-  width: '25px',          // 👈 Icône agrandie de 20px à 28px
-  height: '25px',         // 👈 Icône agrandie de 20px à 28px
+  width: '28px',
+  height: '28px',
   objectFit: 'contain',
 };
 
@@ -412,7 +517,7 @@ const textButtonStyle: React.CSSProperties = {
   fontSize: '13px',
   fontWeight: 'bold',
   cursor: 'pointer',
-  height: '29px',         // 👈 Alignée sur la hauteur de 42px
+  height: '42px',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -420,7 +525,7 @@ const textButtonStyle: React.CSSProperties = {
 
 const separatorStyle: React.CSSProperties = {
   width: '1px',
-  height: '28px',         // 👈 Séparateur réajusté à 28px
+  height: '28px',
   backgroundColor: '#d0d0d0',
   margin: '0 4px',
 };
@@ -442,8 +547,9 @@ const editModalStyle: React.CSSProperties = {
   backgroundColor: '#fff',
   padding: '20px',
   borderRadius: '8px',
-  width: '350px',
   boxShadow: '0 4px 15px rgba(0,0,0,0.3)',
+  maxHeight: '85vh',
+  overflowY: 'auto',
 };
 
 const formGroupStyle: React.CSSProperties = {
@@ -457,6 +563,7 @@ const labelStyle: React.CSSProperties = {
   fontSize: '12px',
   fontWeight: 'bold',
   color: '#333',
+  fontFamily: 'sans-serif',
 };
 
 const inputStyle: React.CSSProperties = {
@@ -466,6 +573,36 @@ const inputStyle: React.CSSProperties = {
   fontSize: '13px',
 };
 
+const portRowStyle: React.CSSProperties = {
+  display: 'flex',
+  gap: '6px',
+  alignItems: 'center',
+  marginBottom: '6px',
+};
+
+const addPortButtonStyle: React.CSSProperties = {
+  backgroundColor: '#e6f7ff',
+  border: '1px solid #91d5ff',
+  color: '#1890ff',
+  fontSize: '11px',
+  fontWeight: 'bold',
+  borderRadius: '4px',
+  padding: '2px 8px',
+  cursor: 'pointer',
+  fontFamily: 'sans-serif',
+};
+
+const deletePortButtonStyle: React.CSSProperties = {
+  backgroundColor: '#fff1f0',
+  border: '1px solid #ffa39e',
+  color: '#ff4d4f',
+  borderRadius: '4px',
+  width: '28px',
+  height: '28px',
+  cursor: 'pointer',
+  fontWeight: 'bold',
+};
+
 const cancelButtonStyle: React.CSSProperties = {
   padding: '6px 12px',
   backgroundColor: '#888',
@@ -473,6 +610,7 @@ const cancelButtonStyle: React.CSSProperties = {
   border: 'none',
   borderRadius: '4px',
   cursor: 'pointer',
+  fontFamily: 'sans-serif',
 };
 
 const saveButtonStyle: React.CSSProperties = {
@@ -482,4 +620,5 @@ const saveButtonStyle: React.CSSProperties = {
   border: 'none',
   borderRadius: '4px',
   cursor: 'pointer',
+  fontFamily: 'sans-serif',
 };
