@@ -23,7 +23,7 @@ Cet outil interactif est conçu pour concevoir et visualiser des **diagrammes de
 
 * **📄 Nouveau / Ouvrir / Sauvegarder :** Réinitialisez le canevas ou gérez vos schémas au format JSON.
 * **➕ Ajouter des Éléments :**
-  * **Nœud Fonction :** Pour représenter un bloc de traitement avec ses arguments et valeurs de retour.
+  * **Fonction :** Pour représenter un bloc de traitement avec ses arguments et valeurs de retour.
   * **Nœud Simple :** Pour représenter une variable, constante ou donnée d'entrée.
 * **🎯 Recentrer le Schéma :** Réajuste automatiquement la vue sur l'ensemble du diagramme.
 * **🎨 Personnalisation du Thème :**
