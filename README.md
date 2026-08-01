@@ -39,9 +39,9 @@ Cet outil interactif est conçu pour concevoir et visualiser des **diagrammes de
 | **Création de Liens** | Glissez un fil depuis un port de sortie vers un port d'entrée.|
 | **Sélection & Suppression** | Cliquez sur un nœud ou un lien, puis appuyez sur la touche `Suppr` (ou `Backspace`) pour le supprimer. |
 | **Zoom & Navigation** | Utilisez la molette de la souris pour zoomer/dézoomer et le clic-glissé sur le fond pour vous déplacer. |
-| **Double-clic** | Ouvre la fenêtre d'édition complète :<\br>
-  <\br>**Nœuds simples :** Modification du nom, type de donnée et commentaire multiligne.
-  <\br>**Fonctions :** Modification du nom, commentaire multiligne, ainsi qu'ajout/suppression/édition dynamique des **entrées** et **sorties**. |
+| **Double-clic** | Ouvre la fenêtre d'édition complète :|
+  ||**Nœuds simples :** Modification du nom, type de donnée et commentaire multiligne.|
+  ||**Fonctions :** Modification du nom, commentaire multiligne, ainsi qu'ajout/suppression/édition dynamique des **entrées** et **sorties**. |
 
 
 ---
