@@ -12,12 +12,15 @@ Cet outil interactif est conçu pour concevoir et visualiser des **diagrammes de
 * **Visualiser l'imbrication d'appels de fonctions** au sein d'un programme.
 * **Synthétiser les structures de données (types)** échangées entre les éléments.
 * **Documenter les spécifications** (entrées, sorties, commentaires explicatifs) sur un support visuel et pédagogique clair.
+<img width="1348" height="375" alt="exemple_kpp" src="https://github.com/user-attachments/assets/324c214c-1988-4949-9c14-7d9eab20a4f1" />
 
 ---
 
 ## 🕹️ Fonctionnalités & Interactions
 
 ### 🛠️ Barre d'Outils (Panneau de Contrôle)
+<img width="547" height="66" alt="menu" src="https://github.com/user-attachments/assets/5e3c7e81-e041-45bd-8ac2-c11527bc6e0e" />
+
 * **📄 Nouveau / Ouvrir / Sauvegarder :** Réinitialisez le canevas ou gérez vos schémas au format JSON.
 * **➕ Ajouter des Éléments :**
   * **Nœud Simple :** Pour représenter une variable, constante ou donnée d'entrée.
