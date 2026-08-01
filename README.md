@@ -1,32 +1,53 @@
-# React + TypeScript + Vite
+# 🧩 Éditeur de Diagrammes de Fonctions
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+> **Accéder à l'application en ligne :**  
+> 🔗 [https://ebuonocore.github.io/diagram-editor/](https://ebuonocore.github.io/diagram-editor/)
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🎯 Objectif du Projet
 
-## React Compiler
+Cet outil interactif est conçu pour concevoir et visualiser des **diagrammes de flux de données et de fonctions**. Il permet de :
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+* **Visualiser l'imbrication d'appels de fonctions** au sein d'un programme.
+* **Synthétiser les structures de données (types)** échangées entre les éléments.
+* **Documenter les spécifications** (entrées, sorties, commentaires explicatifs) sur un support visuel et pédagogique clair.
 
-## Expanding the Oxlint configuration
+---
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+## 🕹️ Fonctionnalités & Interactions
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
-```
+### 🛠️ Barre d'Outils (Panneau de Contrôle)
+* **📄 Nouveau / Ouvrir / Sauvegarder :** Réinitialisez le canevas ou gérez vos schémas au format JSON.
+* **➕ Ajouter des Éléments :**
+  * **Nœud Simple :** Pour représenter une variable, constante ou donnée d'entrée.
+  * **Nœud Fonction :** Pour représenter un bloc de traitement avec ses arguments et valeurs de retour.
+* **🎯 Recentrer le Schéma :** Réajuste automatiquement la vue sur l'ensemble du diagramme.
+* **🎨 Personnalisation du Thème :**
+  * Ajustement des couleurs (fond, liens, en-têtes, corps des nœuds).
+  * Masquage/Affichage des types et des commentaires.
+  * **Import / Export JSON** des configurations de thèmes.
+* **🖼️ Exportation Image :** Téléchargez votre diagramme en haute résolution au format **PNG** ou **SVG**.
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+---
+
+### 🖱️ Interactions à la Souris
+
+| Action | Description |
+| :--- | :--- |
+| **Glisser-Déposer (Drag & Drop)** | Déplacez les nœuds librement sur le canevas. |
+| **Création de Liens** | Glissez un fil depuis un port de sortie vers un port d'entrée. *Une alerte signale toute incompatibilité de type !* |
+| **Sélection & Suppression** | Cliquez sur un nœud ou un lien, puis appuyez sur la touche `Suppr` (ou `Backspace`) pour le supprimer. |
+| **Double-clic** | Ouvre la fenêtre d'édition complète :
+  * **Nœuds simples :** Modification du nom, type de donnée et commentaire multiligne.
+  * **Fonctions :** Modification du nom, commentaire multiligne, ainsi qu'ajout/suppression/édition dynamique des **entrées** et **sorties**. |
+| **Zoom & Navigation** | Utilisez la molette de la souris pour zoomer/dézoomer et le clic-glissé sur le fond pour vous déplacer. |
+
+---
+
+## 🛠️ Stack Technique
+
+* **Framework :** React + TypeScript
+* **Moteur de Graph :** React Flow (`@xyflow/react`)
+* **Build Tool :** Vite
+* **Rendu Image :** `html-to-image`
